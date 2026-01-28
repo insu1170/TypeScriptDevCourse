@@ -53,6 +53,7 @@ const order = (res) => {
             mariadb.query('select * from orderlist', (err, rows) => {
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.write(data);
+
                 rows.forEach((data) => {
                     res.write(`
                 <tr>
@@ -60,7 +61,7 @@ const order = (res) => {
                 <td>${data.order_date} </td>
                 <tr>`)
                 })
-
+                
                 res.write("</table>")
                 res.end()
             })
