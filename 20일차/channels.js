@@ -12,7 +12,7 @@ router.route('/')
         userId && conn.query(
             `SELECT * FROM channels where user_id = ?`, userId,
             function (_err, results, _fields) {
-                if (results.length) {
+                if (results) {
                     res.status(200).json(results)
                 }
                 else {

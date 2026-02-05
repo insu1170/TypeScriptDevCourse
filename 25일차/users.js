@@ -1,8 +1,13 @@
 const express = require('express');
 
-const router = express.Router()
-const conn = require('./mariadb')
-const { body, param, validationResult } = require('express-validator')
+const router = express.Router();
+const conn = require('./mariadb');
+const { body, param, validationResult } = require('express-validator');
+
+// jwt 모듈
+const jwt = require('jsonwebtoken');
+// dotenv 모듈
+const dotenv = require('dotenv').config();
 
 router.route('/users')
     .get((req, res) => {
@@ -26,7 +31,6 @@ router.route('/users')
                 res.status(200).json(results)
             }
         );
-
     });
 
 
@@ -40,11 +44,26 @@ router.post('/login', (req, res) => {
         function (_err, results, _fields) {
             var loginUser = results[0]
             if (loginUser && loginUser.password == password) {
+
+                const token = jwt.sign({
+                    email: loginUser.email,
+                    name: loginUser.name
+                }, process.env.PRIVATE_KEY,{
+                    expiresIn: '5'
+                })
+
+
+                res.cookie("token", token, {
+                    httpOnly: true
+                })
+
                 res.status(200).json({
                     message: `${loginUser.name} 환요ㅕㅇ`
+                    , token: token
+
                 })
             } else {
-                res.status(404).json({
+                res.status(403).json({
                     message: '회원 정보 없삼'
                 })
             }
