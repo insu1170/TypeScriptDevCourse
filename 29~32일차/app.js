@@ -11,9 +11,11 @@ const bookRouter = require('./rotues/books');
 const likeRouter = require('./rotues/likes');
 const cartRouter = require('./rotues/cart');
 const orderRouter = require('./rotues/orders');
+const categoryRouter = require('./rotues/category')
 
 app.use('/users',userRouter)
 app.use('/books',bookRouter)
 app.use('/likes',likeRouter)
+app.use('/category',categoryRouter)
 app.use('/carts',cartRouter)
 app.use('/orders',orderRouter)
