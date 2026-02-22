@@ -15,7 +15,7 @@ const allBooks = (req, res) => {
     console.log("news:", news);
 
     let offset = limit * (currentPage - 1);
-    let sql = "select * from books ";
+    let sql = "select *, (select count(*) from likes where books.id = liked_book_id) AS likes from books ";
     let values = [];
 
     if (category_id && news === 'true') {
@@ -51,12 +51,27 @@ const allBooks = (req, res) => {
 // 개별 도서 조회
 const bookDetail = (req, res) => {
 
-    let { id } = req.params;
+    let { user_id } = req.body
+    let book_id = req.params.id
 
-    let sql = `select * from books left join category 
-                on books.category_id = category.id where books.id = ?;`;
+    let sql = `SELECT 
+    books.*,
+    (SELECT COUNT(*) FROM likes WHERE liked_book_id = books.id) AS likes,
+    (SELECT EXISTS (
+        SELECT 1 
+        FROM likes 
+        WHERE user_id = 1 
+        AND liked_book_id = books.id
+    )) AS liked
+FROM books
+LEFT JOIN category 
+    ON books.category_id = category.category_id
+WHERE books.id = 1`;
+    let values = [user_id, book_id, book_id]
+    // select * from books left join category 
+    // on books.category_id = category.id where books.id = ?;
 
-    conn.query(sql, [id], (err, results) => {
+    conn.query(sql, values, (err, results) => {
         if (err) {
             console.log(err);
             return res.status(StatusCodes.BAD_REQUEST).end();
