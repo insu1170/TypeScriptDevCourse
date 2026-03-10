@@ -28,7 +28,6 @@ const { items, delivery, totalQuantity, totalPrice, userId, firstBookTitle } = r
     // [수정] values 배열을 새로 정의하여 인자 개수를 맞춥니다. (5개)
     let orderValues = [firstBookTitle, totalQuantity, totalPrice, userId, delivery_id];
     [results] = await conn.query(sql, orderValues);
-
     let order_id = results.insertId;
     
     // 3. orderedBook 삽입을 위해 cartItems 정보 조회
@@ -44,7 +43,7 @@ const { items, delivery, totalQuantity, totalPrice, userId, firstBookTitle } = r
         bulkValues.push([order_id, item.book_id, item.quantity]);
     });
 
-    // [수정] query 대신 query를 사용해야 이중 배열(bulk insert)이 인식됩니다.
+    // [수정] query 대신 query를 사용해야 이중 배열(bulk insert)이 인식됩니다.a
     await conn.query(sql, [bulkValues]);
     
     // 5. 장바구니 삭제

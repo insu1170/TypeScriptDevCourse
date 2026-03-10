@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 app.use(express.json());
 
 dotenv.config();
-app.listen(process.env.PORT);
+app.listen(3001);
 
 const userRouter = require('./rotues/users');
 const bookRouter = require('./rotues/books');

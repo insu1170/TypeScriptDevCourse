@@ -1,0 +1,51 @@
+
+const allBooks = (req, res) => {
+    let allBookRes = {}
+
+
+    let { category_id, news, limit, currentPage } = req.query;
+
+    // limit: page 당 도서 수
+    // currentPage: 현재 몇 페이지
+    // offset : 0,3,6,9
+
+    console.log(req.query);
+    console.log("news:", news);
+
+    let offset = limit * (currentPage - 1);
+    let sql = "select sql_calc_found_rows *, (select count(*) from likes where books.id = liked_book_id) AS likes from books ";
+    let values = [];
+
+    if (category_id && news === 'true') {
+        sql += "where category_id = ? and pub_date between date_sub(now(), interval 1 month) and now() ";
+        values.push(category_id);
+
+    } else if (category_id) {
+        sql += "where category_id = ? ";
+        values.push(category_id);
+
+    } else if (news === 'true') {
+        sql += "where pub_date between date_sub(now(), interval 3 month) and now() ";
+    }
+
+    sql += "select found_rows()";
+    values.push(parseInt(limit), offset);
+    conn.query(sql, values, (err, results) => {
+        console.log(sql);
+        console.log(values);
+        if (err) {
+            console.log(err);
+            return res.status(StatusCodes.BAD_REQUEST).end();
+        }
+        let totalCount = results[0].found_rows();
+        let pagination ={};
+        pagination.currentPage =currentPage;
+        allBookRes.totalCount = pagination
+
+        if (results.length) {
+            return res.status(StatusCodes.OK).json(results);
+        } else {
+            return res.status(StatusCodes.NOT_FOUND).end();
+        }
+    });
+};
