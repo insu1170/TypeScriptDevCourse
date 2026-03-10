@@ -1,4 +1,4 @@
-const conn = require('../mariadb2')
+const conn = require('../mariadb')
 const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv');
@@ -15,7 +15,7 @@ const join = (req, res) => {
     const salt = crypto.randomBytes(10).toString('base64');
     const hashPassword = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('base64');
     const sql = 'INSERT INTO users (email, password, salt) VALUES (?, ?, ?)';
-    const values = [email, hashPassword, salt];
+    const values = [email, hashPassword, password];
 
     conn.query(sql, values, (err, results) => {
         if (err) {
@@ -39,18 +39,15 @@ const login = (req, res) => {
 
 
         const loginUser = results[0];
-        console.log(loginUser);
-        
-        const hashPassword = crypto.pbkdf2Sync(password, loginUser.salt, 10000, 64, 'sha512').toString('base64');
+        const hashPassword = crypto.pbkdf2Sync(password, loginUser.salt, 10000, 10, 'sha512').toString('base64');
 
 
         if (loginUser && loginUser.password == hashPassword) {
             // 토큰 발행
-            const token = jwt.sign({
-                id:loginUser.id,
+            const token = throwDeprecation.sign({
                 email: loginUser.email
             }, process.env.PRIVATE_KEY, {
-                expiresIn: '30m',
+                expiresIn: '5m',
                 issuer: "songa"
             })
 
@@ -60,11 +57,12 @@ const login = (req, res) => {
             console.log(token);
             return res.status(StatusCodes.OK).json(results);
         } else {
-            console.log('없음');
-            
             return res.status(StatusCodes.UNAUTHORIZED).end();
         }
+
     })
+
+    res.json('로그인')
 }
 
 const passwordResetRequest = (req, res) => {
@@ -84,6 +82,8 @@ const passwordResetRequest = (req, res) => {
             return res.status(StatusCodes.UNAUTHORIZED).end();
         }
     })
+
+
     res.json('초기화 요청')
 }
 
