@@ -6,11 +6,14 @@ import ListsContainer from './components/ListsContainer/ListsContainer';
 import { useTypedDispatch, useTypedSelector } from './hooks/redux';
 import EditModal from './components/EditModal/EditModal';
 import LoggerModal from './components/LoggerModal/LoggerModal';
-import { deleteBoard } from './store/slices/boardsSlice';
+import { deleteBoard, sort } from './store/slices/boardsSlice';
 import { addLog } from './store/slices/loggerSlice';
 import { v4 } from 'uuid';
-import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core';
+// import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core';
 // import { arrayMove } from '@dnd-kit/sortable';
+import { DragDropContext, type DropResult } from 'react-beautiful-dnd';
+// import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+// import { sortList } from './store/slices/boardsSlice';
 
 function App() {
   const dispatch = useTypedDispatch();
@@ -28,7 +31,7 @@ function App() {
   const handleDeleteBoard = () => {
     if (boards.length > 1) {
       dispatch(deleteBoard({ boardId: getActiveBoard.boardId }));
-      
+
       dispatch(addLog({
         logId: v4(),
         logMessage: `게시판 지우기: ${getActiveBoard.boardName}`,
@@ -42,8 +45,8 @@ function App() {
         )
 
         return indexToBeDeleted === 0
-        ? indexToBeDeleted + 1
-        : indexToBeDeleted - 1
+          ? indexToBeDeleted + 1
+          : indexToBeDeleted - 1
       }
 
       setActiveBoardId(boards[newIndexToSet()].boardId)
@@ -52,18 +55,34 @@ function App() {
     }
   };
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
 
-    if (!over) return;
+    const sourceList = lists.filter(list => list.listId === source.droppableId)[0];
 
-    if (active.id !== over.id) {
-    //   const oldIndex = characters.findIndex(c => c.id === active.id);
-    //   const newIndex = characters.findIndex(c => c.id === over.id);
+    if (!destination) return;
 
-    //   setCharacters(arrayMove(characters, oldIndex, newIndex));
-    }
+    dispatch(
+      sort({
+        boardIndex: boards.findIndex(board => board.boardId === activeBoardId),
+        droppableIdStart: source.droppableId,
+        droppableIdEnd: destination.droppableId,
+        droppableIndexStart: source.index,
+        droppableIndexEnd: destination.index,
+        draggableId
+      })
+    )
+    dispatch(
+      addLog({
+        logId: v4(),
+        logMessage: `"리스트"${sourceList.listName}`,
+        logAuthor: "User",
+        logTimestamp: String(Date.now())
+      })
+    )
+    return;
   }
+
 
   return (
     <div className={appContainer}>
@@ -75,9 +94,9 @@ function App() {
       />
 
       <div className={board}>
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DragDropContext onDragEnd={handleDragEnd}>
           <ListsContainer lists={lists} boardId={getActiveBoard.boardId} />
-        </DndContext>
+        </DragDropContext>
       </div>
       <div className={buttons}>
         <button className={deleteBoardButton} onClick={handleDeleteBoard}>
