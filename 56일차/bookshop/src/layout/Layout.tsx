@@ -1,16 +1,25 @@
-import Footer from "../components/common/Footer.tsx";
-import Header from "../components/common/Header.tsx";
-
+import styled from "styled-components";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
 interface LayoutProps {
     children: React.ReactNode;
 }
 
-export default function Layout({children}): LayoutProps {
-    return (
-        <>
-            <Header/>
+function Layout({children}: LayoutProps) {
+    return(
+        <LayoutStyle>
+            <Header />
             <main>{children}</main>
-            <Footer/>
-        </>
+            <Footer />
+        </LayoutStyle>
     )
 }
+
+const LayoutStyle = styled.main`
+    width: 100%;
+    margin: 0 auto;
+    max-width: ${({theme}) => theme.layout.width.large};
+    padding: 20px 0;
+`
+
+export default Layout

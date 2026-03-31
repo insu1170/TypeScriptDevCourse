@@ -1,8 +1,8 @@
-import {createContext, ReactNode, useEffect, useState} from "react";
-import type {ThemeName} from "../style/theme.ts";
-import {GlobalStyle} from "../style/global.ts";
-import {getTheme} from "../style/theme.ts";
-import {ThemeProvider} from "styled-components";
+import { createContext, ReactNode, useEffect, useState } from "react";
+import type { ThemeName } from "../style/theme.ts";
+import { GlobalStyle } from "../style/global.ts";
+import { getTheme } from "../style/theme.ts";
+import { ThemeProvider } from "styled-components";
 
 const DEFAULT_THEME_NAME = "light";
 const THEME_LOCALSTORAGE_KEY = "book_store_theme"
@@ -14,11 +14,11 @@ interface State {
 
 export const state = {
     themeName: DEFAULT_THEME_NAME as ThemeName,
-    toggleTheme: () => {},
+    toggleTheme: () => { },
 }
 
 export const ThemeContext = createContext<State>(state)
-export const BookStoreThemeProvider = ({children}: {children: ReactNode}) => {
+export const BookStoreThemeProvider = ({ children }: { children: ReactNode }) => {
     const [themeName, setThemeName] = useState<ThemeName>(DEFAULT_THEME_NAME)
 
     const toggleTheme = () => {
@@ -33,9 +33,9 @@ export const BookStoreThemeProvider = ({children}: {children: ReactNode}) => {
     }, [])
 
     return (
-        <ThemeContext.Provider value={{themeName, toggleTheme}}>
+        <ThemeContext.Provider value={{ themeName, toggleTheme }}>
             <ThemeProvider theme={getTheme(themeName)}>
-                <GlobalStyle themeName={themeName}/>
+                <GlobalStyle themeName={themeName} />
                 {children}
             </ThemeProvider>
         </ThemeContext.Provider>

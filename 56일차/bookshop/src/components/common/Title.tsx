@@ -1,0 +1,21 @@
+import styled from "styled-components";
+import type { HeadingSize, ColorKey } from "../../style/theme";
+
+
+interface Props {
+    children: React.ReactNode;
+    size: HeadingSize
+    color?: ColorKey;
+}
+
+function Title({children, size, color}: Props) {
+    return <TitleStyle size={size} color={color} > {children} </TitleStyle>
+ 
+}
+
+const TitleStyle = styled.h1<Omit<Props,"children">>`
+font-size: ${({theme,size})=> theme.heading[size].fontSize};
+color:${({theme, color})=> color ? theme.colors[color] : theme.colors.primary};
+`;
+
+export default Title;
