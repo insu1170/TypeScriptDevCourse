@@ -1,0 +1,26 @@
+import { Book } from "@/models/book.model";
+import styled from "styled-components";
+import BookItem from "../books/BookItem";
+
+interface Props {
+  books: Book[];
+}
+
+function HomeNewBooks({ books }: Props) {
+  return (
+    <HomeNewBooksStyle>
+      {books.map((book) => (
+        <BookItem key={book.id} book={book} view="grid" />
+      ))}
+    </HomeNewBooksStyle>
+  );
+}
+const HomeNewBooksStyle = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  @media ${({ theme }) => theme.mediaQuery.mobile} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+export default HomeNewBooks;
